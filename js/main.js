@@ -4,6 +4,7 @@
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var canAnimate = !reduceMotion && !!window.gsap && !!window.ScrollTrigger;
   var lenis = null;
+  if (!canAnimate) root.classList.remove('preanim');
 
   function headerHeight() { return header ? header.offsetHeight : 0; }
   function setHeaderVar() { root.style.setProperty('--hh', headerHeight() + 'px'); }
@@ -145,6 +146,37 @@
     });
   }
 
+  // First fold: name caption slides in from the right; stat tiles fly in from their outer sides
+  function initHero() {
+    var cap = document.querySelector('.hero-portrait figcaption');
+    if (cap) {
+      gsap.from(cap, {
+        xPercent: 130, autoAlpha: 0, duration: 1.1, delay: 0.25, ease: 'power3.out',
+        scrollTrigger: { trigger: cap, start: 'top 95%', once: true }
+      });
+    }
+    var stats = document.querySelector('.stats');
+    var tiles = gsap.utils.toArray('.stats li');
+    if (stats && tiles.length) {
+      var box = stats.getBoundingClientRect();
+      var cx = box.left + box.width / 2, cy = box.top + box.height / 2;
+      var tl = gsap.timeline({ delay: 0.35, scrollTrigger: { trigger: stats, start: 'top 92%', once: true } });
+      tiles.forEach(function (li, i) {
+        var r = li.getBoundingClientRect();
+        var dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
+        var sx = dx < -1 ? -1 : dx > 1 ? 1 : 0;   // which side of the group this tile sits on
+        var sy = dy < -1 ? -1 : dy > 1 ? 1 : 0;   // 0 when tiles are in a single row
+        tl.from(li, {
+          x: dx * 0.6 + sx * 90, y: sy ? dy * 0.6 + sy * 60 : 50,
+          rotation: sx * 8, scale: 0.7, autoAlpha: 0, duration: 1, ease: 'back.out(1.5)'
+        }, i * 0.08);
+        var num = li.querySelector('[data-count]');
+        if (num) tl.add(function () { countUp(num); }, i * 0.08);
+      });
+    }
+    root.classList.remove('preanim');
+  }
+
   // Quick-facts deck: pinned, each card slides over the previous one
   function initDeck() {
     var section = document.getElementById('quick-facts');
@@ -250,7 +282,7 @@
   }
 
   if (canAnimate) {
-    gsap.utils.toArray('.stats [data-count]').forEach(countUp);
+    initHero();
     initDeck();
     initReveals(document);
     initQuote();

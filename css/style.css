@@ -96,7 +96,8 @@ html.lenis, html.lenis body { height: auto; }
 .text-link:hover { text-decoration: underline; }
 
 /* ───────── Hero (first fold) ───────── */
-.hero { background: var(--hero-bg); }
+.hero { background: var(--hero-bg); overflow-x: clip; } /* clip lets tiles fly in from off-screen without a horizontal scrollbar */
+.preanim .stats li, .preanim .hero-portrait figcaption { visibility: hidden; }
 .hero-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: 1.1fr .9fr; align-items: end; gap: 24px; }
 .hero-copy { padding: 56px 0; align-self: center; }
 .eyebrow { display: flex; align-items: center; gap: 10px; font-size: .75rem; letter-spacing: .14em; font-weight: 700; color: var(--saffron-text); margin: 0 0 16px; }
