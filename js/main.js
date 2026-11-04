@@ -97,7 +97,6 @@
         storyImage(f) +
         '<div class="story-featured-body">' +
           '<h3>' + esc(f.title) + '</h3>' +
-          '<p>' + esc(f.summary) + '</p>' +
           '<span class="story-cta">Read on Deccan Herald <i aria-hidden="true">→</i></span>' +
         '</div>' +
       '</a>';
@@ -107,9 +106,7 @@
         return '<a class="story-card" href="' + esc(s.url) + '" target="_blank" rel="noopener" data-reveal>' +
           storyImage(s) +
           '<div class="story-card-body">' +
-            (s.tag ? '<span class="story-tag story-tag-soft">' + esc(s.tag) + '</span>' : '') +
             '<h3>' + esc(s.title) + '</h3>' +
-            '<p>' + esc(s.summary) + '</p>' +
             '<span class="story-cta">Read story <i aria-hidden="true">→</i></span>' +
           '</div></a>';
       }).join('') + '</div>';

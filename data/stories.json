@@ -1,6 +1,34 @@
 [
-  { "title": "Placeholder: What the Yuva Sanghas scheme means for rural Karnataka", "summary": "Replace with a DH story summary. The first story in this file is shown as the large lead card.", "url": "https://www.deccanherald.com/", "image": "" },
-  { "tag": "Ground report", "title": "Placeholder: Inside a Sangha — how ₹10 lakh will be used", "summary": "Replace with a DH story summary.", "url": "https://www.deccanherald.com/", "image": "" },
-  { "tag": "Voices", "title": "Placeholder: Young Karnataka on leadership and community", "summary": "Replace with a DH story summary.", "url": "https://www.deccanherald.com/", "image": "" },
-  { "tag": "Explainer", "title": "Placeholder: From OTP to Membership Card — joining, step by step", "summary": "Replace with a DH story summary.", "url": "https://www.deccanherald.com/", "image": "" }
+  {
+    "tag": "Bengaluru",
+    "title": "I.N.D.I.A. bloc to stage protest at Bengaluru's Freedom Park on Nov 5 against SIR, CEC resignation",
+    "summary": "Hariprasad accused the BJP and RSS of attempting to undermine democracy by misusing constitutional institutions and said the agitation would continue until Kumar resigned.",
+    "url": "https://www.deccanherald.com/india/karnataka/bengaluru/india-bloc-to-stage-protest-at-bengalurus-freedom-park-on-nov-5-against-sir-cec-resignation-4206439",
+    "image": "https://images.deccanherald.com/deccanherald/2026-11-04/ygbs84sp/file87uozs4z5gjm2mz9qwc.jpg?w=1600&auto=format%2Ccompress&fit=max",
+    "published": "2026-11-04T00:23:58.461000+00:00"
+  },
+  {
+    "tag": "Karnataka",
+    "title": "Karnataka Deputy CM Parameshwara writes to PM Modi, seeks Rs 22,400 cr drought relief",
+    "summary": "Karnataka has declared 226 taluks as drought-affected with crops spread across 57.93 lakh hectares suffering damage.",
+    "url": "https://www.deccanherald.com/india/karnataka/karnataka-deputy-cm-parameshwara-writes-to-pm-modi-seeks-rs-22400-cr-drought-relief-4206431",
+    "image": "https://images.deccanherald.com/deccanherald/2026-11-04/pb7surxi/file84ej3u0t0a8ghizrheg.jpg?w=800&auto=format%2Ccompress&fit=max",
+    "published": "2026-11-04T00:16:31.551000+00:00"
+  },
+  {
+    "tag": "Karnataka",
+    "title": "Karnataka signs agreement with Rotary Bengaluru; launches laptop, computer distribution under Jnana Setu scheme",
+    "summary": "As explained by the minister, the Jnana Setu will help the government to address the need for computers at the colleges with a large number of students.",
+    "url": "https://www.deccanherald.com/india/karnataka/karnataka-signs-agreement-with-rotary-bengaluru-launches-laptop-computer-distribution-under-jnana-setu-scheme-4204986",
+    "image": "https://images.deccanherald.com/deccanherald/2026-11-04/vr9gcgt1/istockphoto-2149270452-612x612.jpg?w=800&auto=format%2Ccompress&fit=max",
+    "published": "2026-11-04T00:10:28.964000+00:00"
+  },
+  {
+    "tag": "Karnataka",
+    "title": "VAO exam: KEA releases list of 5,000 candidates, marks scored to prove transparency",
+    "summary": "The probe by the DC into the performance of the Haveri candidate in the VAO examination found that he had extensively used his mobile phone while writing the exam.",
+    "url": "https://www.deccanherald.com/india/karnataka/vao-exam-kea-releases-list-of-5000-candidates-marks-scored-to-prove-transparency-4206509",
+    "image": "https://images.deccanherald.com/deccanherald/2026-09-09/9o8jiesl/file83yhh6eo7bs11kebx1qy.jpg?w=800&auto=format%2Ccompress&fit=max",
+    "published": "2026-11-04T00:02:30.727000+00:00"
+  }
 ]
