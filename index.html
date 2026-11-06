@@ -104,7 +104,8 @@
         </div>
       </div>
 
-      <!-- STORIES: the highlight. Rendered from data/stories.json (first item = featured) -->
+      <!-- STORIES: the highlight. Rendered from data/stories.json (first item = featured).
+           "See all" shows only when the collection has more stories than the section does. -->
       <section class="stories-section" id="stories">
         <div class="wrap">
           <div class="section-head" data-reveal>
@@ -112,6 +113,9 @@
             <h2>Stories from <em>Young Karnataka</em></h2>
           </div>
           <div id="story-root" aria-live="polite"></div>
+          <div class="see-all" id="see-all" hidden data-reveal>
+            <a class="button button-outline" href="#all/stories" data-track="see_all_stories">See all stories <span aria-hidden="true">→</span></a>
+          </div>
         </div>
       </section>
 
@@ -281,6 +285,20 @@
             </a>
             <!-- TODO: add BJYS Android app link once the official Play Store URL is confirmed -->
           </div>
+        </div>
+      </section>
+
+      <!-- ALL STORIES: shown in place of the home page while the address is #all/stories[/<page>] -->
+      <section class="stories-section all-stories" id="all-stories" aria-labelledby="all-stories-title" hidden>
+        <div class="wrap">
+          <a class="all-back" href="#stories"><span aria-hidden="true">←</span> Back to the home page</a>
+          <div class="section-head">
+            <p class="kicker kicker-neon">FROM DECCAN HERALD</p>
+            <h2 id="all-stories-title" tabindex="-1">All stories from <em>Young Karnataka</em></h2>
+            <p class="all-status" id="all-status" aria-live="polite"></p>
+          </div>
+          <div class="story-grid" id="all-list"></div>
+          <nav class="pager" id="all-pager" aria-label="Pages"></nav>
         </div>
       </section>
 

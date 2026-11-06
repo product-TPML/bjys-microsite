@@ -32,10 +32,16 @@
     var a = e.target.closest('a[href^="#"]');
     if (!a || a.classList.contains('skip-link')) return;
     var id = a.getAttribute('href');
-    if (id.length < 2) return;
-    var target = document.querySelector(id);
+    if (id.length < 2 || id.indexOf('#all/') === 0) return; // "See all" pages: handled by the hash router
+    var target = document.getElementById(id.slice(1));
     if (!target) return;
     e.preventDefault();
+    if (inAllView()) {
+      // Leaving "See all" for a home section: a new history entry, so Back returns to the list
+      history.pushState(null, '', id);
+      showHome(target);
+      return;
+    }
     scrollToTarget(target);
     if (history.replaceState) history.replaceState(null, '', id);
   });
@@ -78,7 +84,13 @@
   }
 
   /* ───────── Stories from data/stories.json (first = featured) ───────── */
+  var HOME_STORIES = 4;       // lead card + one row of three on the home page
+  var STORIES_PER_PAGE = 24;  // "See all" page: fills one, two or three columns evenly
+  var STORIES_FALLBACK = 'https://www.deccanherald.com/india/karnataka';
   var storyRoot = document.getElementById('story-root');
+  var seeAll = document.getElementById('see-all');
+  var allStories = null;      // every story in the collection, once loaded ([] if it failed)
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -88,6 +100,14 @@
     return '<div class="story-img">' +
       (s.image ? '<img src="' + esc(s.image) + '" alt="" loading="lazy">' : '<span class="story-ph">DH STORY</span>') +
       '</div>';
+  }
+  function storyCard(s, reveal) {
+    return '<a class="story-card" href="' + esc(s.url) + '" target="_blank" rel="noopener"' + (reveal ? ' data-reveal' : '') + '>' +
+      storyImage(s) +
+      '<div class="story-card-body">' +
+        '<h3>' + esc(s.title) + '</h3>' +
+        '<span class="story-cta">Read story <i aria-hidden="true">→</i></span>' +
+      '</div></a>';
   }
   function renderStories(items) {
     if (!items || !items.length) { document.getElementById('stories').hidden = true; return; }
@@ -100,30 +120,133 @@
           '<span class="story-cta">Read on Deccan Herald <i aria-hidden="true">→</i></span>' +
         '</div>' +
       '</a>';
-    var rest = items.slice(1);
+    var rest = items.slice(1, HOME_STORIES);
     if (rest.length) {
-      html += '<div class="story-grid" data-stagger>' + rest.map(function (s) {
-        return '<a class="story-card" href="' + esc(s.url) + '" target="_blank" rel="noopener" data-reveal>' +
-          storyImage(s) +
-          '<div class="story-card-body">' +
-            '<h3>' + esc(s.title) + '</h3>' +
-            '<span class="story-cta">Read story <i aria-hidden="true">→</i></span>' +
-          '</div></a>';
-      }).join('') + '</div>';
+      html += '<div class="story-grid" data-stagger>' + rest.map(function (s) { return storyCard(s, true); }).join('') + '</div>';
     }
     storyRoot.innerHTML = html;
+    seeAll.hidden = items.length <= HOME_STORIES;
     if (canAnimate) {
-      try { initReveals(storyRoot); ScrollTrigger.refresh(); }
+      try { initReveals(storyRoot.parentNode); ScrollTrigger.refresh(); }
       catch (err) { console.error('[BJYS] story animations failed', err); }
     }
   }
+
+  /* ───────── "See all": #all/stories[/<page>] shows every story, a page at a time, in place of the home page ───────── */
+  var main = document.getElementById('main');
+  var allSection = document.getElementById('all-stories');
+  var allTitle = document.getElementById('all-stories-title');
+  var allStatus = document.getElementById('all-status');
+  var allList = document.getElementById('all-list');
+  var allPager = document.getElementById('all-pager');
+  var homeTitle = document.title;
+  var homeY = 0; // where the reader was on the home page, for the browser's Back button
+
+  function inAllView() { return main.dataset.view === 'all'; }
+  function allPageFromHash() {
+    var m = location.hash.match(/^#all\/stories(?:\/(\d+))?\/?$/);
+    return m ? Math.max(1, parseInt(m[1] || '1', 10)) : 0;
+  }
+  function pageHref(n) { return n === 1 ? '#all/stories' : '#all/stories/' + n; }
+  function setNavActive(href) {
+    navLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === href); });
+  }
+
+  // After sections are shown or hidden: re-measure scroll animations, then jump (no smooth scroll)
+  function jumpTo(target) {
+    if (canAnimate) ScrollTrigger.refresh();
+    var y = typeof target === 'number' ? target : target.getBoundingClientRect().top + window.scrollY - headerHeight();
+    if (lenis) {
+      if (lenis.resize) lenis.resize();
+      lenis.scrollTo(y, { immediate: true, force: true });
+    } else {
+      window.scrollTo(0, y);
+    }
+  }
+
+  // Page links: first, last, and the current page with its neighbours; "…" fills the gaps.
+  // Phones leave out the neighbours so the row fits.
+  function pagerHTML(current, pages) {
+    function step(n, label, arrow) {
+      return n >= 1 && n <= pages
+        ? '<a class="pager-step" href="' + pageHref(n) + '" aria-label="' + label + '">' + arrow + '</a>'
+        : '<span class="pager-step" aria-hidden="true">' + arrow + '</span>';
+    }
+    var shown = [1, current - 1, current, current + 1, pages]
+      .filter(function (n, i, a) { return n >= 1 && n <= pages && a.indexOf(n) === i; })
+      .sort(function (a, b) { return a - b; });
+    var html = step(current - 1, 'Previous page', '‹');
+    shown.forEach(function (n, i) {
+      if (i > 0 && n - shown[i - 1] > 1) html += '<span class="pager-gap" aria-hidden="true">…</span>';
+      var cls = 'pager-page' + (Math.abs(n - current) === 1 && n !== 1 && n !== pages ? ' pager-near' : '');
+      html += n === current
+        ? '<span class="' + cls + '" aria-current="page" aria-label="Page ' + n + '">' + n + '</span>'
+        : '<a class="' + cls + '" href="' + pageHref(n) + '" aria-label="Page ' + n + '">' + n + '</a>';
+    });
+    return html + step(current + 1, 'Next page', '›');
+  }
+
+  function showAll(page) {
+    if (!inAllView()) {
+      homeY = window.scrollY;
+      main.dataset.view = 'all';
+      allSection.hidden = false;
+    }
+    setNavActive('#stories');
+    allList.innerHTML = '';
+    allPager.innerHTML = '';
+
+    if (allStories === null) {
+      allStatus.textContent = 'Loading stories…';
+    } else if (!allStories.length) {
+      allStatus.innerHTML = 'These stories couldn’t be loaded here. <a href="' + STORIES_FALLBACK + '" target="_blank" rel="noopener">See them on Deccan Herald</a>';
+    } else {
+      var pages = Math.ceil(allStories.length / STORIES_PER_PAGE);
+      var current = Math.min(page, pages);
+      allStatus.textContent = allStories.length + ' stories · page ' + current + ' of ' + pages;
+      allList.innerHTML = allStories.slice((current - 1) * STORIES_PER_PAGE, current * STORIES_PER_PAGE)
+        .map(function (s) { return storyCard(s, false); }).join('');
+      if (pages > 1) allPager.innerHTML = pagerHTML(current, pages);
+      document.title = 'All stories' + (current > 1 ? ' (page ' + current + ')' : '') + ' | ' + homeTitle;
+      if (canAnimate) {
+        gsap.from(allList.children, { y: 40, autoAlpha: 0, duration: 0.7, stagger: 0.04, ease: 'power3.out', clearProps: 'transform,opacity,visibility' });
+      }
+    }
+    jumpTo(0);
+    allTitle.focus({ preventScroll: true });
+  }
+
+  function showHome(target) {
+    if (!inAllView()) return;
+    delete main.dataset.view;
+    allSection.hidden = true;
+    allList.innerHTML = '';
+    allPager.innerHTML = '';
+    document.title = homeTitle;
+    jumpTo(target || homeY);
+  }
+
+  function route() {
+    var page = allPageFromHash();
+    if (page) { showAll(page); return; }
+    var target = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+    // Back from "See all" restores the reader's place unless the address names a section
+    showHome(target && target.id !== 'home' ? target : null);
+  }
+  window.addEventListener('hashchange', route);
+
   fetch('data/stories.json')
     .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(renderStories, function (err) {
+    .then(function (items) {
+      allStories = Array.isArray(items) ? items : [];
+      renderStories(allStories);
+    }, function (err) {
       console.error('[BJYS] could not load stories', err);
+      allStories = [];
       document.getElementById('stories').hidden = true;
       if (canAnimate) ScrollTrigger.refresh();
-    });
+    })
+    .then(function () { if (inAllView()) route(); });
 
   /* ───────── Animations ───────── */
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -200,7 +323,8 @@
         scrub: 0.7,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.5 }, delay: 0.08, ease: 'power1.inOut' },
+        // No snapping while "See all" hides the deck, or it would snap the story list to card positions
+        snap: { snapTo: function (v) { return inAllView() ? v : Math.round(v * (n - 1)) / (n - 1); }, duration: { min: 0.2, max: 0.5 }, delay: 0.08, ease: 'power1.inOut' },
         onUpdate: function (self) {
           var i = Math.min(n - 1, Math.round(self.progress * (n - 1)));
           if (i !== last) { indexEl.textContent = pad(i + 1); last = i; }
@@ -277,6 +401,8 @@
       }
     });
   }
+
+  if (allPageFromHash()) route();
 
   if (canAnimate) {
     initHero();

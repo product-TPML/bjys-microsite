@@ -228,6 +228,35 @@ html.anim .fact-card .button { margin-top: 0; }
 .story-card h3 { font-family: var(--font-head); font-size: 1.3rem; line-height: 1.2; }
 .story-card .story-cta { margin-top: auto; padding-top: 6px; font-size: .92rem; }
 
+/* "See all": outline button under the stories (only when the collection has more) */
+.see-all:not([hidden]) { display: flex; justify-content: center; margin-top: 44px; }
+.button-outline { color: #fff; background: var(--glass); box-shadow: inset 0 0 0 1.5px var(--glass-line); }
+.button-outline span { transition: transform .25s; }
+.button-outline:hover, .button-outline:focus-visible { transform: translateY(-2px); box-shadow: inset 0 0 0 1.5px var(--neon-saffron), 0 16px 36px -12px rgba(255, 159, 46, .55); }
+.button-outline:hover span { transform: translateX(4px); }
+
+/* All-stories view (#all/stories[/n]): replaces the home page; header and footer stay */
+main[data-view="all"] > .hero,
+main[data-view="all"] .after-fold > :not(.all-stories) { display: none; }
+.all-stories { padding: 48px 0 100px; min-height: calc(100svh - var(--hh, 0px)); }
+.all-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 34px; color: var(--text-dim); font-weight: 700; font-size: .95rem; text-decoration: none; transition: color .2s; }
+.all-back span { transition: transform .25s; }
+.all-back:hover, .all-back:focus-visible { color: var(--neon-saffron); }
+.all-back:hover span { transform: translateX(-4px); }
+.all-stories h2:focus { outline: none; }
+.all-status { margin: 14px 0 0; color: var(--text-dim); font-weight: 600; }
+.all-status a { color: var(--neon-saffron); }
+.all-stories .story-grid { margin-top: 0; }
+
+.pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 52px; }
+.pager:empty { display: none; }
+.pager a, .pager span { min-width: 46px; height: 46px; padding: 0 10px; display: inline-grid; place-items: center; border-radius: 999px; font-weight: 700; color: #fff; text-decoration: none; background: var(--glass); border: 1px solid var(--glass-line); transition: border-color .2s, transform .2s; }
+.pager a:hover, .pager a:focus-visible { border-color: var(--neon-saffron); transform: translateY(-2px); }
+.pager [aria-current="page"] { border: 0; background: linear-gradient(135deg, var(--neon-saffron), var(--neon-pink)); box-shadow: 0 10px 26px -8px rgba(255, 79, 163, .6); }
+.pager .pager-step { font-size: 1.4rem; line-height: 1; }
+.pager span.pager-step { opacity: .3; }
+.pager .pager-gap { min-width: 0; padding: 0 2px; background: none; border: 0; color: var(--text-dim); }
+
 /* ───────── Quote ───────── */
 .quote-section { padding: 110px 0; position: relative; overflow: hidden;
   background: radial-gradient(800px 500px at 100% 50%, rgba(255, 159, 46, .14), transparent 70%), var(--bg-dark-2); }
@@ -333,6 +362,12 @@ a.join-primary:hover { box-shadow: 0 36px 80px -20px rgba(255, 79, 163, .9); }
   .story-card .story-img { aspect-ratio: 21 / 9; }
   .story-card-body { padding: 14px 16px 16px; gap: 6px; }
   .story-card h3 { font-size: 1.15rem; }
+  .see-all:not([hidden]) { margin-top: 30px; }
+  .all-stories { padding: 32px 0 96px; } /* clears the fixed bottom nav */
+  .all-back { margin-bottom: 24px; }
+  .pager { gap: 6px; margin-top: 36px; }
+  .pager a, .pager span { min-width: 42px; height: 42px; }
+  .pager .pager-near { display: none; }
   .join-grid { grid-template-columns: 1fr; }
   .join-primary, .join-docs { grid-column: auto; }
   .ticker { padding: 9px 0; }
@@ -348,5 +383,5 @@ a.join-primary:hover { box-shadow: 0 36px 80px -20px rgba(255, 79, 163, .9); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ticker-track { animation: none; }
-  .button, .story-card, .join-card, .share-btn, .story-img img { transition: none; }
+  .button, .story-card, .join-card, .share-btn, .story-img img, .pager a { transition: none; }
 }
